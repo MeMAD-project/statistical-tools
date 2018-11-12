@@ -1,0 +1,25 @@
+CC coordin. conjunction and, but, or                            SYM symbol +,%, &
+CD cardinal number one, two                                     TO “to” to
+DT determiner a, the                                            UH interjection ah, oops
+EX existential ‘there’ there                                    VB verb base form eat
+FW foreign word mea culpa                                       VBD verb past tense ate
+IN preposition/sub-conj of, in, by                              VBG verb gerund eating
+JJ adjective yellow                                             VBN verb past participle eaten
+JJR adj., comparative bigger                                    VBP verb non-3sg pres eat
+JJS adj., superlative wildest                                   VBZ verb 3sg pres eats
+LS list item marker 1, 2, One                                   WDT wh-determiner which, that
+MD modal can, should                                            WP wh-pronoun what, who
+NN noun, sing. or mass llama                                    WP$ possessive wh- whose
+NNS noun, plural llamas                                         WRB wh-adverb how, where
+NNP proper noun, sing. IBM                                      $ dollar sign $
+NNPS proper noun, plural Carolinas                              # pound sign #
+PDT predeterminer all, both                                     “ left quote ‘ or “
+POS possessive ending ’s                                        ” right quote ’ or ”
+PRP personal pronoun I, you, he                                 ( left parenthesis [, (, {, <
+PRP$ possessive pronoun your, one’s                             ) right parenthesis ], ), }, >
+RB adverb quickly, never                                        , comma ,
+RBR adverb, comparative faster                                  . sentence-final punc . ! ?
+RBS adverb, superlative fastest                                 : mid-sentence punc : ; ... – -
+RP particle up, off
+
+Source: https://web.stanford.edu/~jurafsky/slp3/10.pdf
