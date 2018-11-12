@@ -1,5 +1,7 @@
 # Project specific ignores:
 submit.sh
+build/
+vg.sublime-*
 
 # Generic ignores:
 
