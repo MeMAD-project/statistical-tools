@@ -2,18 +2,13 @@ import pandas as pd
 import json
 import matplotlib.pyplot as plt
 from matplotlib_venn import venn2
-from matplotlib.patches import Rectangle
 import matplotlib.image as mpimg
 import re
 from collections import Counter
 import numpy as np
 from nltk.corpus import wordnet as wn
-import pickle
 import marshal
-import re
 import os
-
-DATA_DIR = '/scratch/cs/imagedb/picsom/databases/visualgenome/download/'
 
 
 def test_reload():
@@ -46,10 +41,10 @@ def load_data(json_file, reload=False):
     pickle_file = os.path.join('pickles', file_name_no_ext + ".marshal")
 
     if os.path.exists(pickle_file) and not reload:
-        print(f"Loading {pickle_file}...")
+        print("Loading {}...".format(pickle_file))
         data = marshal.load(open(pickle_file, "rb"))
     else:
-        print(f"Loading {json_file}...")
+        print("Loading {}...".format(json_file))
         data = load_json(json_file)
         marshal.dump(data, open(pickle_file, "wb"))
 
@@ -113,7 +108,7 @@ def count_attributes_per_synset(data, query_synset):
     attr_cnt = Counter()  # count total number of attributes per query_word
     query_cnt = 0  # count number of query
 
-    print(f"Counting attributes for synsets matching {query_synset}")
+    print("Counting attributes for synsets matching {}".format(query_synset))
 
     for i, row in enumerate(data):
         for attr in row['attributes']:
@@ -134,7 +129,8 @@ def count_attributes_per_synset(data, query_synset):
 
                     # print(f"Entry {i} contains match '{s}' with attributes {attrs}")
     print(
-        f"Done. {len(data)} rows processed, {query_cnt} intances of '{query_synset}' found")
+        "Done. {} rows processed, {} intances of '{}' found".format(
+            len(data), query_cnt, query_synset))
 
     return word_cnt, attr_shared_cnt, attr_cnt, query_cnt
 
@@ -172,7 +168,8 @@ def count_attribute_synsets(data, synset_names):
         if row_matched:
             rows += 1
 
-    print(f"Done. {len(data)} rows processed, {matches} instances of found in {rows} rows")
+    print("Done. {} rows processed, {} instances of found in {} rows".format(
+        len(data), matches, rows))
 
     return synset_attr_cnt, name_attr_cnt, synset_img_cnt, name_img_cnt, matches, rows
 
@@ -198,14 +195,6 @@ def count_relationships(data, synset_names, verbs=False):
 
     verbs: when True, only count relations where relation is a verb
     """
-
-    # TODO: setup 3 dicts for storing 4 types of counters:
-
-    subj = {}
-    obj = {}
-
-    subj_or_obj = {}
-    subj_and_obj = {}
 
     rel_name_cnt = Counter()  # count relation names where human is a subject
     rel_syn_cnt = Counter()  # count relation synsets where human is a subject
@@ -255,9 +244,12 @@ def count_relationships(data, synset_names, verbs=False):
         if row_matched:
             rows += 1
 
-    print(f"Done. {len(data)} rows processed, {matches} instances {'with verbs' if verbs else ''}found in {rows} rows")
+    print("Done. {} rows processed, {} instances {} found in {} rows".format(
+        len(data), matches, 'with verbs' if verbs else '', rows))
 
-    return (rel_name_cnt, rel_syn_cnt), (subj_name_cnt, subj_syn_cnt), (obj_name_cnt, obj_syn_cnt)
+    return ((rel_name_cnt, rel_syn_cnt),
+            (subj_name_cnt, subj_syn_cnt),
+            (obj_name_cnt, obj_syn_cnt))
 
 
 def stats_on_humans_in_relationships(data):
@@ -277,7 +269,7 @@ def stats_on_humans_in_relationships(data):
     cnt['rels'] = {}
     cnt['imgs'] = {}
 
-    # We are counting relationships with 
+    # We are counting relationships with
     #  - All relationships in dataset
     #  - All relationships with human subjects
     #  - All relationships with human objects
@@ -354,37 +346,45 @@ def stats_on_humans_in_relationships(data):
                     cnt['rels']['verbs']['subj_and_obj'] += 1
                     subj_and_obj_human_verb_image = True
 
-        if subj_human_image: cnt['imgs']['all']['subj'] += 1
-        if obj_human_image: cnt['imgs']['all']['obj'] += 1
-        if subj_and_obj_human_image: cnt['imgs']['all']['subj_and_obj'] += 1
+        if subj_human_image:
+            cnt['imgs']['all']['subj'] += 1
+        if obj_human_image:
+            cnt['imgs']['all']['obj'] += 1
+        if subj_and_obj_human_image:
+            cnt['imgs']['all']['subj_and_obj'] += 1
 
-        if subj_human_verb_image: cnt['imgs']['verbs']['subj'] += 1
-        if obj_human_verb_image: cnt['imgs']['verbs']['obj'] += 1
-        if subj_and_obj_human_verb_image: cnt['imgs']['verbs']['subj_and_obj'] += 1
-        
-        if image_has_verb: cnt['imgs']['verbs']['all'] += 1
+        if subj_human_verb_image:
+            cnt['imgs']['verbs']['subj'] += 1
+        if obj_human_verb_image:
+            cnt['imgs']['verbs']['obj'] += 1
+        if subj_and_obj_human_verb_image:
+            cnt['imgs']['verbs']['subj_and_obj'] += 1
 
-        if human_found: index.append(i)
+        if image_has_verb:
+            cnt['imgs']['verbs']['all'] += 1
+
+        if human_found:
+            index.append(i)
 
     # Print the stats:
     print("Summary statistics - Relationships")
     print("=" * 30)
     print("All relationships:")
     print("-" * 20)
-    print(f"Relations with human subjects:\t{cnt['rels']['all']['subj']}")
-    print(f"Relations with human objects:\t{cnt['rels']['all']['obj']}")
-    print(
-        f"Relations with both human subjects and objects:\t{cnt['rels']['all']['subj_and_obj']}\n")
-    print(f"All relationships (human and not):\t{cnt['rels']['all']['all']}\n")
+    print("Relations with human subjects:\t{}".format(cnt['rels']['all']['subj']))
+    print("Relations with human objects:\t{}".format(cnt['rels']['all']['obj']))
+    print("Relations with both human subjects and objects:\t{}\n".format(
+        cnt['rels']['all']['subj_and_obj']))
+    print("All relationships (human and not):\t{}\n".format(cnt['rels']['all']['all']))
     print("=" * 30)
     print("Relationships with verbs:")
     print("-" * 20)
-    print(f"Relations with human subjects:\t{cnt['rels']['verbs']['subj']}")
-    print(f"Relations with human objects:\t{cnt['rels']['verbs']['obj']}")
-    print(
-        f"Relations with both human subjects and objects:\t{cnt['rels']['verbs']['subj_and_obj']}\n")
-    print(
-        f"All relationships with verbs (human and not):\t{cnt['rels']['verbs']['all']}")
+    print("Relations with human subjects:\t{}".format(cnt['rels']['verbs']['subj']))
+    print("Relations with human objects:\t{}".format(cnt['rels']['verbs']['obj']))
+    print("Relations with both human subjects and objects:\t{}\n".format(
+        cnt['rels']['verbs']['subj_and_obj']))
+    print("All relationships with verbs (human and not):\t{}".format(
+        cnt['rels']['verbs']['all']))
 
     print("\n\n\n")
 
@@ -392,20 +392,20 @@ def stats_on_humans_in_relationships(data):
     print("=" * 30)
     print("All images:")
     print("-" * 20)
-    print(f"Images with human subjects:\t{cnt['imgs']['all']['subj']}")
-    print(f"Images with human objects:\t{cnt['imgs']['all']['obj']}")
-    print(
-        f"Images with both human subjects and objects:\t{cnt['imgs']['all']['subj_and_obj']}\n")
-    print(f"All images (human and not):\t{cnt['imgs']['all']['all']}\n")
+    print("Images with human subjects:\t{}".format(cnt['imgs']['all']['subj']))
+    print("Images with human objects:\t{}".format(cnt['imgs']['all']['obj']))
+    print("Images with both human subjects and objects:\t{}\n".format(
+        cnt['imgs']['all']['subj_and_obj']))
+    print("All images (human and not):\t{}\n".format(cnt['imgs']['all']['all']))
     print("=" * 30)
     print("Images with verbs:")
     print("-" * 20)
-    print(f"Images with human subjects:\t{cnt['imgs']['verbs']['subj']}")
-    print(f"Images with human objects:\t{cnt['imgs']['verbs']['obj']}")
+    print("Images with human subjects:\t{}".format(cnt['imgs']['verbs']['subj']))
+    print("Images with human objects:\t{}".format(cnt['imgs']['verbs']['obj']))
+    print("Images with both human subjects and objects:\t{}\n".format(
+        cnt['imgs']['verbs']['subj_and_obj']))
     print(
-        f"Images with both human subjects and objects:\t{cnt['imgs']['verbs']['subj_and_obj']}\n")
-    print(
-        f"All images with verbs (human and not):\t{cnt['imgs']['verbs']['all']}")
+        "All images with verbs (human and not):\t{}".format(cnt['imgs']['verbs']['all']))
 
     return cnt, index
 
@@ -414,7 +414,8 @@ def indexed_images_relationship_match(data, indices, synset_matches):
     """
     For each image in the data matched with with indices, see if there is a synset_match
     data - relationship json
-    indices - indices of images that we are interested in (in the first use cas this is humans / persons)
+    indices - indices of images that we are interested in (in the first use case
+              these are humans / persons)
     synset_matches - callable, outputs whether sysnset matches some top level synset
     """
 
@@ -428,14 +429,9 @@ def indexed_images_relationship_match(data, indices, synset_matches):
 
     return index_matches
 
-# Synset conversion functions:
-
-# TODO
-
 
 # Output functions:
-
-def plot_venn(counts, labels, title, filename = None, batch = False):
+def plot_venn(counts, labels, title, filename=None, batch=False):
     if batch:
         plt.switch_backend('agg')
 
@@ -459,18 +455,17 @@ def plot_venn(counts, labels, title, filename = None, batch = False):
 
     _ = plt.text(-0.65, 0.52, labels[-1], fontsize=14)
     _ = plt.text(0.65, 0.52, str(not_AB), fontsize=16)
-    _ = plt.text(-0.65, -0.72,
-                 f"Total human: {total_humans}", fontsize=16)
-    _ = plt.text(-0.65, -0.82,
-                 f"Total: {total_all}", fontsize=16)
+    _ = plt.text(-0.65, -0.72, "Total human: {}".format(total_humans), fontsize=16)
+    _ = plt.text(-0.65, -0.82, "Total: {}".format(total_all), fontsize=16)
 
     if filename:
         save_to = 'plots/' + filename + '.png'
-        print(f"Saving plot to {save_to}")
+        print("Saving plot to {}".format(save_to))
         plt.savefig(save_to, bbox_inches='tight',
                     facecolor='white', transparent=False)
 
     plt.show()
+
 
 def plot_relationship_venn(counts, filename=None, batch=False):
     """
@@ -502,13 +497,13 @@ def plot_relationship_venn(counts, filename=None, batch=False):
     for text in v.subset_labels:
         text.set_fontsize(16)
 
-    #plt.gca().set_axis_on()
+    # plt.gca().set_axis_on()
     _ = plt.text(-0.65, 0.52, 'Other relations', fontsize=14)
     _ = plt.text(0.65, 0.52, str(not_AB1), fontsize=16)
     _ = plt.text(-0.65, -0.72,
-                 f"Total human relationships: {total_humans1}", fontsize=16)
+                 "Total human relationships: {}".format(total_humans1), fontsize=16)
     _ = plt.text(-0.65, -0.82,
-                 f"Total relationships: {total_all1}", fontsize=16)
+                 "Total relationships: {}".format(total_all1), fontsize=16)
 
     ax = plt.subplot(2, 1, 2)
 
@@ -519,9 +514,10 @@ def plot_relationship_venn(counts, filename=None, batch=False):
     total_humans2 = A2 + B2 - AB2
     total_all2 = counts['verbs']['rels']
 
-    _ = plt.title('Relations with humans as subject or object\nrelations are verbs', 
-        fontsize=20)
-    v = venn2(subsets=(counts['verbs']['subj'], counts['verbs']['obj'], counts['verbs']['subj_and_obj']),
+    _ = plt.title('Relations with humans as subject or object\nrelations are verbs',
+                  fontsize=20)
+    v = venn2(subsets=(counts['verbs']['subj'], counts['verbs']['obj'],
+                       counts['verbs']['subj_and_obj']),
               set_labels=('Human Subjects', 'Human Objects'))
 
     for text in v.set_labels:
@@ -529,19 +525,19 @@ def plot_relationship_venn(counts, filename=None, batch=False):
     for text in v.subset_labels:
         text.set_fontsize(16)
 
-    #plt.gca().set_axis_on()
+    # plt.gca().set_axis_on()
     _ = plt.text(-0.65, 0.52, 'Other relations', fontsize=14)
     _ = plt.text(0.65, 0.52, str(not_AB2), fontsize=16)
     _ = plt.text(-0.65, -0.72,
-                 f"Total human relationships: {total_humans2}", fontsize=16)
+                 "Total human relationships: {}".format(total_humans2), fontsize=16)
     _ = plt.text(-0.65, -0.82,
-                 f"Total relationships: {total_all2}", fontsize=16)
+                 "Total relationships: {}".format(total_all2), fontsize=16)
 
     plt.subplots_adjust(hspace=0.5)
 
     if filename:
         save_to = 'plots/' + filename + '.png'
-        print(f"Saving plot to {save_to}")
+        print("Saving plot to {}".format(save_to))
         plt.savefig(save_to, bbox_inches='tight',
                     facecolor='white', transparent=False)
 
@@ -550,10 +546,10 @@ def plot_relationship_venn(counts, filename=None, batch=False):
 
 def plot_bar_counts(counter, maxnum=20, title=None, filename=None, batch=False):
     if batch:
-        print(f"Batch mode. Saving plot to file.")
+        print("Batch mode. Saving plot to file.")
         plt.switch_backend('agg')
 
-    print(f"Plotting {title}...")
+    print("Plotting {}...".format(title))
 
     if not len(counter):
         print("Empty counter, exiting")
@@ -584,17 +580,19 @@ def plot_bar_counts(counter, maxnum=20, title=None, filename=None, batch=False):
         save_to = 'plots/' + filename + '.png'
         path = os.path.dirname(save_to)
         os.makedirs(path, exist_ok=True)
-        print(f"Saving plot to {save_to}")
+        print("Saving plot to {}".format(save_to))
         plt.savefig(save_to, bbox_inches='tight')
 
-    if not batch: plt.show()
+    if not batch:
+        plt.show()
 
 
-def plot_bar_counts_side_by_side(counters, names, maxnum=20, title=None, filename=None, batch=False):
+def plot_bar_counts_side_by_side(counters, names, maxnum=20, title=None,
+                                 filename=None, batch=False):
     if batch:
         plt.switch_backend('agg')
 
-    print(f"Plotting {title}...")
+    print("Plotting {}...".format(title))
 
     if not len(counters[0]) and not len(counters[1]):
         print("Both counters empty, exiting")
@@ -638,7 +636,9 @@ def plot_bar_counts_side_by_side(counters, names, maxnum=20, title=None, filenam
 
     if filename:
         save_to = 'plots/' + filename + '.png'
-        print(f"Saving plot to {save_to}")
+        path = os.path.dirname(save_to)
+        os.makedirs(path, exist_ok=True)
+        print("Saving plot to {}".format(save_to))
         plt.savefig(save_to, bbox_inches='tight',
                     facecolor='white', transparent=False)
     if not batch:
@@ -665,8 +665,8 @@ def counter_to_csv(counter, countername, filename, desc=None):
     os.makedirs(path, exist_ok=True)
 
     with open(filename, 'w') as f:
-        print(f"Creating CSV with {desc}")
-        print(f"Saving to {filename} ")
+        print("Creating CSV with {}".format(desc))
+        print("Saving to {} ".format(filename))
         if desc:
             f.write('#' + desc + '\n')
 
@@ -705,7 +705,7 @@ def img_id_to_filename(img_id, dataset, base_path, prefix=None):
 
 def display_image_and_caption(img_path, captions, keywords):
     img = mpimg.imread(img_path)
-    imgplot = plt.imshow(img)
+    plt.imshow(img)
 
     for (caption, keyword_tuples) in zip(captions, keywords):
         words, synsets, categories = zip(*keyword_tuples)
@@ -722,6 +722,7 @@ def sample_entries(df, n_samples, group_by):
 
 def show_samples(grouped, group_by, caption_field_name, category_name):
     pass
+
 
 # Initialize the list of all known human synsets:
 human_synsets = get_all_humans()
