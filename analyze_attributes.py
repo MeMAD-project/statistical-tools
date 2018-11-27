@@ -10,43 +10,41 @@ def main(args):
 
     synset = 'person.n.01'
     print("=" * 80)
-    print("Counting attributes for synset: {}".format(synset))
     (word_cnt, attr_shared_cnt,
-        attr_cnt, query_cnt) = va.count_attributes_per_synset(data, synset)
+     attr_cnt, query_cnt) = va.count_attributes_per_synset(data, synset)
 
-    va.plot_and_output_csv(word_cnt, 'synset', 25,
+    va.plot_and_output_csv([word_cnt], ['synset'], 25,
                            "Attribute counts for: {}".format(synset),
                            'attributes/count_{}'.format(synset),
                            batch=True)
 
     print("-" * 80)
 
-    va.plot_and_output_csv(attr_shared_cnt, 'synset', 25,
+    va.plot_and_output_csv([attr_shared_cnt], ['synset'], 25,
                            "Attribute combinations counts: {}".format(synset),
                            'attributes/combi_count_{}'.format(synset),
                            batch=True)
 
     print("-" * 80)
 
-    va.plot_and_output_csv(attr_cnt, 'synset', 25,
+    va.plot_and_output_csv([attr_cnt], ['synset'], 25,
                            "Object attribute counts: {}".format(synset),
                            'attributes/raw_numbers_{}'.format(synset),
                            batch=True)
 
     print("=" * 80)
-    print("Counting attributes for synsets that refer to human beings defined by:")
     print(va.human_synsets)
 
     (synset_attr_cnt, name_attr_cnt, synset_img_cnt, name_img_cnt,
-      matches, rows) = va.count_attribute_synsets(data, va.human_synsets)
+     matches, rows) = va.count_attribute_synsets(data, va.human_synsets)
 
-    va.plot_and_output_csv(synset_attr_cnt, 'synset', 40,
+    va.plot_and_output_csv([synset_attr_cnt], ['synset'], 40,
                            "Attributes with people synsets in attribute data",
                            'attributes/people_syns_attributes', batch=True)
 
     print("-" * 80)
 
-    va.plot_and_output_csv(name_attr_cnt, 'name', 40,
+    va.plot_and_output_csv([name_attr_cnt], ['name'], 40,
                            "Attributes with people names in attribute data",
                            'attributes/people_names_attributes', batch=True)
 
@@ -56,13 +54,13 @@ def main(args):
 
     print("-" * 80)
 
-    va.plot_and_output_csv(synset_img_cnt, 'synset', 40,
+    va.plot_and_output_csv([synset_img_cnt], ['synset'], 40,
                            "Images with people synsets in attribute data",
                            'attributes/people_syns_images', batch=True)
 
     print("-" * 80)
 
-    va.plot_and_output_csv(name_img_cnt, 'name', 40,
+    va.plot_and_output_csv([name_img_cnt], ['name'], 40,
                            "Images with people names in attribute data",
                            'attributes/people_names_images', batch=True)
 

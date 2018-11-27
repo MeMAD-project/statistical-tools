@@ -673,23 +673,23 @@ def counter_to_csv(counter, countername, filename, desc=None):
         df.to_csv(f, index=False)
 
 
-def plot_and_output_csv(counter, name, maxnum, title, filename_base, batch=False):
+def plot_and_output_csv(counters, names, maxnum, title, filename_base, batch=False):
     """
     Runs plotting and csv saving functions. Designed to plot either 1 or 2 plots
     depending on the number of counters given (currently accepts 1 or 2 counters).
     """
-    # if len(counters) == 1:
-    plot_bar_counts(counter, maxnum, title,
-                    filename_base + '_' + name, batch)
-    counter_to_csv(counter, name,
-                   filename_base + '_' + name, title)
-    # else:
-    #    plot_bar_counts_side_by_side(
-    #        counters, names, maxnum, title, filename_base, batch)
-    #    counter_to_csv(counters[0], names[0],
-    #                   filename_base + '_' + names[0], title)
-    #    counter_to_csv(counters[1], names[1],
-    #                   filename_base + '_' + names[1], title)
+    if len(counters) == 1:
+        plot_bar_counts(counters[0], maxnum, title,
+                        filename_base + '_' + names[0], batch)
+        counter_to_csv(counters[0], names[0],
+                       filename_base + '_' + names[0], title)
+    else:
+        plot_bar_counts_side_by_side(
+            counters, names, maxnum, title, filename_base, batch)
+        counter_to_csv(counters[0], names[0],
+                       filename_base + '_' + names[0], title)
+        counter_to_csv(counters[1], names[1],
+                       filename_base + '_' + names[1], title)
 
 
 def img_id_to_filename(img_id, dataset, base_path, prefix=None):
