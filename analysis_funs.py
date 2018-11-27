@@ -36,8 +36,8 @@ def load_json(json_file):
 
 def load_data(json_file, reload=False):
     """
-        Loads json_file from pickle if json_file.pickle is found, else loads the actual json file 
-    and creates a new pickle.
+        Loads json_file from pickle if json_file.pickle is found,
+        else loads the actual json file and creates a new pickle.
     reload = True forces this behavior
     """
     data = None
@@ -582,9 +582,11 @@ def plot_bar_counts(counter, maxnum=20, title=None, filename=None, batch=False):
 
     if filename:
         save_to = 'plots/' + filename + '.png'
+        path = os.path.dirname(save_to)
+        os.makedirs(path, exist_ok=True)
         print(f"Saving plot to {save_to}")
         plt.savefig(save_to, bbox_inches='tight')
-    
+
     if not batch: plt.show()
 
 
@@ -646,7 +648,7 @@ def plot_bar_counts_side_by_side(counters, names, maxnum=20, title=None, filenam
 def counter_to_csv(counter, countername, filename, desc=None):
     """
     counter - counter object (may be unsorted)
-    filename - partial filename of the form "type/name", base dir and extension added 
+    filename - partial filename of the form "type/name", base dir and extension added
             automatically by this function
     countername - name of the column with labels of the counts (e.g 'synset' or 'name')
     desc - optional description that is added as a comment on the first line of the CSV
@@ -659,6 +661,9 @@ def counter_to_csv(counter, countername, filename, desc=None):
 
     filename = base_dir + filename + '.csv'
 
+    path = os.path.dirname(filename)
+    os.makedirs(path, exist_ok=True)
+
     with open(filename, 'w') as f:
         print(f"Creating CSV with {desc}")
         print(f"Saving to {filename} ")
@@ -668,23 +673,23 @@ def counter_to_csv(counter, countername, filename, desc=None):
         df.to_csv(f, index=False)
 
 
-def plot_and_output_csv(counters, names, maxnum, title, filename_base, batch=False):
+def plot_and_output_csv(counter, name, maxnum, title, filename_base, batch=False):
     """
-    Runs plotting and csv saving functions. Designed to plot either 1 or 2 plots depending on the
-    number of counters given (currently accepts 1 or 2 counters).
+    Runs plotting and csv saving functions. Designed to plot either 1 or 2 plots
+    depending on the number of counters given (currently accepts 1 or 2 counters).
     """
-    if len(counters) == 1:
-        plot_bar_counts(counters[0], maxnum, title,
-                        filename_base + '_' + names[0], batch)
-        counter_to_csv(counters[0], names[0],
-                         filename_base + '_' + names[0], title)
-    else:
-        plot_bar_counts_side_by_side(
-            counters, names, maxnum, title, filename_base, batch)
-        counter_to_csv(counters[0], names[0],
-                       filename_base + '_' + names[0], title)
-        counter_to_csv(counters[1], names[1],
-                       filename_base + '_' + names[1], title)
+    # if len(counters) == 1:
+    plot_bar_counts(counter, maxnum, title,
+                    filename_base + '_' + name, batch)
+    counter_to_csv(counter, name,
+                   filename_base + '_' + name, title)
+    # else:
+    #    plot_bar_counts_side_by_side(
+    #        counters, names, maxnum, title, filename_base, batch)
+    #    counter_to_csv(counters[0], names[0],
+    #                   filename_base + '_' + names[0], title)
+    #    counter_to_csv(counters[1], names[1],
+    #                   filename_base + '_' + names[1], title)
 
 
 def img_id_to_filename(img_id, dataset, base_path, prefix=None):
