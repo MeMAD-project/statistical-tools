@@ -25,8 +25,20 @@ Tools for creating dataset stats
 
 ### Generic linguistic analysis
 
+First you will need to download and unzip Stanford Part-Of-Speech (POS) tagger. To perform this run the following command inside the project folder:
+
+`bash download_pos_tagger.sh`
+
+Next, please make sure that your Java runtime environment is at least version 1.8:
+
+`java -version`
+
+If the version is lower than 1.8, you will need to make sure that you update your environment to use Java `>= 1.8`. On CSC _Taito_ environment this can be done with:
+
+`module load java/oracle/1.8`
+
 *Visual Genome region descriptions*
 
-`python3 tag_sentences.py --dataset vg-regions \
+`python3 tag_sentences.py --dataset vg-regions --num_workers 4 --num_batches 16 \
     --input_file /proj/mediaind/picsom/databases/visualgenome/download/1.2/VG/1.2/region_descriptions.json \
-    --output_file output/pos_tags_vg_regions.txt`
+    --output_file output/pos_tags_vg_regions.json`
