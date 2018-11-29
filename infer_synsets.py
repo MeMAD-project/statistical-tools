@@ -1,11 +1,12 @@
 """Disambiguate word senses"""
-import warnings
-warnings.filterwarnings("ignore", message="numpy.dtype size changed, may indicate binary incompatibility. Expected 96, got 88")
-warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
+# import warnings
+# warnings.filterwarnings("ignore", message="numpy.dtype size changed, may indicate binary incompatibility. Expected 96, got 88")
+# warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
 import argparse
 import sys
+from datetime import datetime
 import os
-import pickle
+import json
 from tqdm import tqdm
 import random
 from nltk.corpus import wordnet as wn
@@ -118,44 +119,61 @@ def top_synset(word, tags):
 
 
 def main(args):
-    sentence_data = pickle.load(open(args.sentences_pickle, 'rb'))
+    print("Loading POS tagged sentences from: {}".format(args.pos_tagged_sentences))
+    sentence_data = json.load(open(args.pos_tagged_sentences, 'rb'))
+
+    if args.max_sentences is not None and args.max_sentences < len(sentence_data):
+        print("WARNING: Limiting the number of sentences being processed to {}".format(
+            args.max_sentences))
+        sentence_data = sentence_data[:args.max_sentences]
+
     sentences = pd.Series(sentence_data)
     num_sentences = len(sentences)
+
     print("Loaded {} sentences...".format(num_sentences))
 
     # Added index at 34222 which is known to have adjectives we need:
-    random_indices = [random.randint(0, num_sentences) for i in range(5)] + [34222]
+    test_indices = [random.randint(0, num_sentences) for i in range(5)]
 
-    print("5 random tagged sentences at indices: {}".format(random_indices))
-    for i, idx in enumerate(random_indices):
+    print("5 random sentences at indices: {}".format(test_indices))
+    for i, idx in enumerate(test_indices):
         print('{}: {}'.format(i + 1, sentences.iloc[idx]))
+
+    begin = datetime.now()
+    print("Starting infering synsets at {}".format(begin))
 
     sentence_syns = sentences.progress_apply(lambda x: sentence_to_synsets_top(x))
     sentence_syns.name = 'sentence_syns'
 
-    print("Obtained most likely synsets for {} sentences".
-          format(len(sentence_syns)))
+    end = datetime.now()
 
-    print("5 random sentences with synsets: {}".format(random_indices))
-    for i, idx in enumerate(random_indices):
+    print("Synset inference ended at {}. Total inference time: {}.".format(end, end - begin))
+    print("Obtained most likely synsets for {} sentences".format(len(sentence_syns)))
+
+    print("5 random sentences with synsets: {}".format(test_indices))
+    for i, idx in enumerate(test_indices):
         print('{}: {}'.format(i + 1, sentence_syns.iloc[idx]))
 
-    file_name = os.path.basename(args.sentences_pickle)
+    file_name = os.path.basename(args.pos_tagged_sentences)
     file_name_no_ext = os.path.splitext(file_name)[0]
-    output_file_name = '{}_syns.pandas.pkl'.format(file_name_no_ext)
+    output_file_name = '{}_syns.json'.format(file_name_no_ext)
     output_path = os.path.join(args.output_path, output_file_name)
 
     print("Saving results to {}".format(output_path))
 
-    sentence_syns.to_pickle(output_path)
+    sentence_syns.to_json(output_path)
+
+    print("DONE!")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('sentences_pickle', nargs='?', type=str, default='',
-                        help='Path to pickle file with tagged sentences')
-    parser.add_argument('--output_path', type=str, default='pickles/',
+    parser.add_argument('pos_tagged_sentences', nargs='?', type=str, default='',
+                        help='Path to JSON file with tagged sentences')
+    parser.add_argument('--output_path', type=str, default='output/',
                         help='path where to save output pickles')
+    parser.add_argument('--max_sentences', type=int,
+                        help='Used for debugging - set cap on the number of sentences')
 
     args = parser.parse_args()
 
