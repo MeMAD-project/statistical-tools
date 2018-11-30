@@ -186,14 +186,11 @@ def humans_in_objects(data):
 
 def count_relationships(data, synset_names, verbs=False):
     """
-    TODO:
-    Count relationships of the synset_names in data based on 4 types of counts:
+    Count relationships of the synset_names in data based on these types of counts:
             1 = count the relationships where subjects  match synset_names
             2 = count the relationships where objects match synset_names
-            3 = count the cases where at least subject or object match humans
-            4 = count the cases where both subjects and objects match synset names
 
-    verbs: when True, only count relations where relation is a verb
+    param: verbs - when True, only count relations where relation is a verb
     """
 
     rel_name_cnt = Counter()  # count relation names where human is a subject
@@ -244,8 +241,8 @@ def count_relationships(data, synset_names, verbs=False):
         if row_matched:
             rows += 1
 
-    print("Done. {} rows processed, {} instances {} found in {} rows".format(
-        len(data), matches, 'with verbs' if verbs else '', rows))
+    print("Done. {} rows processed, {} instances{} found in {} rows".format(
+        len(data), matches, ' with verbs' if verbs else '', rows))
 
     return ((rel_name_cnt, rel_syn_cnt),
             (subj_name_cnt, subj_syn_cnt),
