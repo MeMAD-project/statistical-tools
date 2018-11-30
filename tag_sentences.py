@@ -138,12 +138,15 @@ def main(args):
                                java_options='-mx4000m')
 
     print("Loading dataset {}".format(args.dataset))
-    if args.dataset in ['vg_regions', 'coco', 'vist_dii']:
+    if args.dataset in ['vg-regions', 'coco', 'vist_dii']:
         with open(args.input_file) as f:
             raw_data = json.load(f)
     elif args.dataset in ['picsom']:
         with open(args.input_file) as f:
             raw_data = f.readlines()
+    else:
+        print("ERROR: Unknown datasest")
+        sys.exit(1)
 
     print("Collecting all sentences...")
     sentences = collect_sentences(raw_data)
