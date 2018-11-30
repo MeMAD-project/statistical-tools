@@ -8,9 +8,13 @@ from nltk.corpus import wordnet as wn
 import pandas as pd
 from tqdm import tqdm
 import os
+import re
+
 
 warnings.filterwarnings(
-    "ignore", message="numpy.dtype size changed, may indicate binary incompatibility. Expected 96, got 88")
+    "ignore",
+    message="numpy.dtype size changed, may indicate binary incompatibility. "
+    "Expected 96, got 88")
 tqdm.pandas()
 
 
@@ -58,7 +62,29 @@ def dataset_to_pandas(data_file, dataset):
         # Creates Pandas data frame with 'regions' object as a root:
         df = json_normalize(data, 'regions')
     elif dataset == 'coco':
-        df = None
+        with open(data_file) as f:
+            data = json.load(f)
+        # Creates Pandas data frame with 'regions' object as a root:
+        df = json_normalize(data, 'annotations')
+    elif dataset == 'picsom':
+        with open(data_file) as f:
+            data = f.readlines()
+
+        sentences = []
+
+        for line in data:
+            line = line.rstrip()
+            # Match first non-space characters into one group, and captions into other:
+            m = re.match('([^ ]+) (.*)', line)
+            assert m, 'ERROR: Reading  gt input file failed'
+            label = m.group(1)
+            captions = m.group(2)
+            current_sentences = captions.split(' # ')
+            current_sentences = [{'label': label, 'text': s} for s in current_sentences]
+            sentences = sentences + current_sentences
+
+        df = pd.DataFrame(sentences)
+
     else:
         print("ERROR: Unknown dataset: {}.".format(dataset))
         sys.exit(1)
