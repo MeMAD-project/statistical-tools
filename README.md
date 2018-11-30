@@ -10,9 +10,7 @@ Tools for creating dataset stats
 * tqdm (for showing progress)
 * nltk, after installing nltk run `nltk.download('wordnet')` in Python shell
 
-## Running instructions
-
-### Visual Genome dataset analysis
+## Visual Genome dataset analysis
 
 *Human synsets in Visual Genome attribute data*
 
@@ -24,7 +22,7 @@ Tools for creating dataset stats
 `python3 vg_analyze_relationships.py  --rel_counts
     --relationships_json /proj/mediaind/picsom/databases/visualgenome/download/1.2/VG/1.2/relationships.json`
 
-### Extracting information on words belonging to different categories, such as time, location, etc
+## Extracting information on words belonging to different categories, such as time, location, etc
 
 First you will need to download and unzip Stanford Part-Of-Speech (POS) tagger. To perform this run the following command inside the project folder:
 
@@ -40,9 +38,9 @@ If the version is lower than 1.8, you will need to make sure that you update you
 
 `module load java/oracle/1.8`
 
-#### Example: Analyze Visual Genome region descriptions and COCO captions
+### Example: Analyze Visual Genome region descriptions, COCO captions and MSR-VTT video captions in PicSOM format
 
-Stage 1: Preprocess that data
+#### Stage 1: Preprocess that data
 
 1.1) Perform POS tagging, store result in JSON file:
 
@@ -77,7 +75,7 @@ _PicSOM_:
 
 `python3 infer_synsets.py output/pos_tags_picsom_msrvtt_raw.json --output_path output`
 
-Stage 2: Match categories and extract stats
+#### Stage 2: Match categories and extract stats
 
 2.1) Match synsets to categories
 
@@ -114,7 +112,7 @@ _PicSOM_:
 NOTE: In case of _PicSOM_ we are grouping by `label` instead of `image_id`
 
 
-### Extending generic analysis
+## Extending generic analysis
 
 * Different data set handlers can be added to:
     *  `tag_sentences.py` to produce per sentence POS tagging for an arbitrary list of sentences
