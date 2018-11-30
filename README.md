@@ -119,3 +119,5 @@ NOTE: In case of _PicSOM_ we are grouping by `label` instead of `image_id`
     * `match_synsets_to_categories.py`.
 
 * One can add more category types to `categories.py`. Right now only `location` and `temporal` types are supported.
+
+* Currently POS tags are not used for inferring relationships and attributes. Adding support for this would require some work.
