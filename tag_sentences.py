@@ -9,10 +9,11 @@ import argparse
 import sys
 import os
 from datetime import datetime
+import re
 
 
 def collect_sentences_vg(data):
-    """Collect all sentences from the VisualGenome regions and tag them"""
+    """Collect all sentences from the VisualGenome regions"""
     sentences = []
     for img in data:
         for region in img['regions']:
@@ -22,10 +23,27 @@ def collect_sentences_vg(data):
 
 
 def collect_sentences_coco(data):
-    """Collect all sentences from the VisualGenome regions and tag them"""
+    """Collect all sentences from COCO captions"""
     sentences = []
     for ann in data['annotations']:
         sentences.append(ann['caption'])
+
+    return sentences
+
+
+def collect_sentences_picsom(data):
+    """Collect all sentences from MSR-VTT gt-* files. Captions are in the following format:
+    Each line in text starts with a 4 digit number such as 0001 or 1234 etc, followed by
+    captions separated by " # " , last caption is followed by EOL"""
+    sentences = []
+    for line in data:
+        line = line.rstrip()
+        # Match first non-space characters into one group, and captions into other:
+        m = re.match('([^ ]+) (.*)', line)
+        assert m, 'ERROR: Reading  gt input file failed'
+        captions = m.group(2)
+        current_sentences = captions.split(' # ')
+        sentences = sentences + current_sentences
 
     return sentences
 
@@ -102,19 +120,30 @@ def main(args):
         collect_sentences = collect_sentences_coco
     elif args.dataset == 'vist-dii':
         collect_sentences = collect_sentences_vist_dii
+    elif args.dataset == 'picsom':
+        collect_sentences = collect_sentences_picsom
     else:
         print("Invalid dataset {}".format(args.dataset))
         sys.exit(1)
 
     print("Loading tagger...")
-    tagger = StanfordPOSTagger(
-        'stanford-postagger-2017-06-09/models/english-bidirectional-distsim.tagger',
-        path_to_jar='stanford-postagger-2017-06-09/stanford-postagger.jar',
-        java_options='-mx4000m')
+    current_path = os.path.dirname(os.path.realpath(__file__))
+    tagger_model = os.path.join(current_path, 'stanford-postagger-2017-06-09/'
+                                              'models/english-bidirectional-distsim.tagger')
+    tagger_jar = os.path.join(current_path,
+                              'stanford-postagger-2017-06-09/'
+                              'stanford-postagger.jar')
+
+    tagger = StanfordPOSTagger(tagger_model, path_to_jar=tagger_jar,
+                               java_options='-mx4000m')
 
     print("Loading dataset {}".format(args.dataset))
-    with open(args.input_file) as f:
-        raw_data = json.load(f)
+    if args.dataset in ['vg_regions', 'coco', 'vist_dii']:
+        with open(args.input_file) as f:
+            raw_data = json.load(f)
+    elif args.dataset in ['picsom']:
+        with open(args.input_file) as f:
+            raw_data = f.readlines()
 
     print("Collecting all sentences...")
     sentences = collect_sentences(raw_data)
